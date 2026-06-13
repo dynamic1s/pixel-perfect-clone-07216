@@ -59,7 +59,10 @@ export const updateConversationStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ResolveInput.parse(input))
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = { status: data.status };
+    const patch: {
+      status: "active" | "escalated" | "resolved";
+      ai_enabled?: boolean;
+    } = { status: data.status };
     if (data.reEnableAi !== undefined) patch.ai_enabled = data.reEnableAi;
     if (data.status === "resolved") patch.ai_enabled = false;
     const { error } = await context.supabase
