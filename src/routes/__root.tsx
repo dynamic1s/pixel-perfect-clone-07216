@@ -79,11 +79,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "BizBot — AI Sales Assistant for WhatsApp & Telegram" },
+      {
+        name: "description",
+        content:
+          "BizBot is an AI business assistant that chats with customers, recommends products, takes orders and collects payments automatically on WhatsApp and Telegram.",
+      },
+      { name: "author", content: "BizBot" },
+      { property: "og:title", content: "BizBot — AI Sales Assistant" },
+      {
+        property: "og:description",
+        content:
+          "Automate sales conversations, orders and payments across WhatsApp and Telegram with an AI assistant.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },

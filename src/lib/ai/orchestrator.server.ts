@@ -1,30 +1,28 @@
 // AI Orchestrator — Gemini-powered sales assistant brain.
 // Server-only. Decides intent + action from a customer message using ONLY real product data.
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 export const ESCALATION_CONFIDENCE_THRESHOLD = 0.65;
 
 export const AiDecisionSchema = z.object({
-  intent: z.enum(["order", "faq", "complaint", "greeting", "other"]),
-  action: z.enum([
-    "create_order",
-    "reply",
-    "escalate",
-    "check_stock",
-    "send_payment",
-  ]),
+  intent: z
+    .enum(["order", "faq", "complaint", "greeting", "other"])
+    .catch("other"),
+  action: z
+    .enum(["create_order", "reply", "escalate", "check_stock", "send_payment"])
+    .catch("reply"),
   items: z
     .array(
       z.object({
         product: z.string(),
-        quantity: z.number().int().positive(),
+        quantity: z.coerce.number().int().positive().catch(1),
       }),
     )
-    .default([]),
-  reply: z.string(),
-  confidence: z.number().min(0).max(1),
+    .catch([]),
+  reply: z.string().catch(""),
+  confidence: z.coerce.number().min(0).max(1).catch(0.5),
 });
 
 export type AiDecision = z.infer<typeof AiDecisionSchema>;
@@ -95,12 +93,38 @@ export async function runOrchestrator(
     .map((m) => `${m.sender === "customer" ? "Customer" : "Assistant"}: ${m.content}`)
     .join("\n");
 
-  const { experimental_output } = await generateText({
+  const { text } = await generateText({
     model: gateway("google/gemini-2.5-flash"),
     system: buildSystemPrompt(ctx),
-    prompt: `${historyText ? `Conversation so far:\n${historyText}\n\n` : ""}New customer message: "${ctx.customerMessage}"\n\nRespond with your decision as JSON.`,
-    experimental_output: Output.object({ schema: AiDecisionSchema }),
+    prompt: `${historyText ? `Conversation so far:\n${historyText}\n\n` : ""}New customer message: "${ctx.customerMessage}"\n\nRespond ONLY with a single JSON object (no markdown, no code fences) matching this shape: {"intent": "order|faq|complaint|greeting|other", "action": "create_order|reply|escalate|check_stock|send_payment", "items": [{"product": "exact catalog name", "quantity": 1}], "reply": "your message to the customer", "confidence": 0.0-1.0}.`,
   });
 
-  return experimental_output;
+  return parseDecision(text);
+}
+
+function parseDecision(text: string): AiDecision {
+  let raw = text.trim();
+  // Strip code fences if present.
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced) raw = fenced[1].trim();
+  // Extract the first JSON object.
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    raw = raw.slice(start, end + 1);
+  }
+  let json: unknown;
+  try {
+    json = JSON.parse(raw);
+  } catch {
+    // Could not parse — escalate safely.
+    return {
+      intent: "other",
+      action: "escalate",
+      items: [],
+      reply: "",
+      confidence: 0,
+    };
+  }
+  return AiDecisionSchema.parse(json);
 }
