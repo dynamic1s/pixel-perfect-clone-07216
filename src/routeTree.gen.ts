@@ -15,10 +15,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSimulatorRouteImport } from './routes/_authenticated/simulator'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated/integrations'
 import { Route as AuthenticatedEscalationsRouteImport } from './routes/_authenticated/escalations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedConversationsRouteImport } from './routes/_authenticated/conversations'
+import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as ApiPublicWebhooksWhatsappRouteImport } from './routes/api/public/webhooks/whatsapp'
 import { Route as ApiPublicWebhooksTelegramRouteImport } from './routes/api/public/webhooks/telegram'
 import { Route as ApiPublicWebhooksPaystackRouteImport } from './routes/api/public/webhooks/paystack'
@@ -53,6 +56,12 @@ const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIntegrationsRoute =
+  AuthenticatedIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEscalationsRoute =
   AuthenticatedEscalationsRouteImport.update({
     id: '/escalations',
@@ -75,6 +84,16 @@ const AuthenticatedConversationsRoute =
     path: '/conversations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicWebhooksWhatsappRoute =
   ApiPublicWebhooksWhatsappRouteImport.update({
     id: '/api/public/webhooks/whatsapp',
@@ -103,10 +122,13 @@ const ApiPublicHooksRunRemindersRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRoute
   '/conversations': typeof AuthenticatedConversationsRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/escalations': typeof AuthenticatedEscalationsRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/products': typeof AuthenticatedProductsRoute
   '/simulator': typeof AuthenticatedSimulatorRoute
@@ -118,10 +140,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/campaigns': typeof AuthenticatedCampaignsRoute
   '/conversations': typeof AuthenticatedConversationsRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/escalations': typeof AuthenticatedEscalationsRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/products': typeof AuthenticatedProductsRoute
   '/simulator': typeof AuthenticatedSimulatorRoute
@@ -135,10 +160,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
   '/_authenticated/conversations': typeof AuthenticatedConversationsRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/escalations': typeof AuthenticatedEscalationsRoute
+  '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/simulator': typeof AuthenticatedSimulatorRoute
@@ -152,10 +180,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/analytics'
+    | '/campaigns'
     | '/conversations'
     | '/customers'
     | '/dashboard'
     | '/escalations'
+    | '/integrations'
     | '/orders'
     | '/products'
     | '/simulator'
@@ -167,10 +198,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/analytics'
+    | '/campaigns'
     | '/conversations'
     | '/customers'
     | '/dashboard'
     | '/escalations'
+    | '/integrations'
     | '/orders'
     | '/products'
     | '/simulator'
@@ -183,10 +217,13 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/analytics'
+    | '/_authenticated/campaigns'
     | '/_authenticated/conversations'
     | '/_authenticated/customers'
     | '/_authenticated/dashboard'
     | '/_authenticated/escalations'
+    | '/_authenticated/integrations'
     | '/_authenticated/orders'
     | '/_authenticated/products'
     | '/_authenticated/simulator'
@@ -250,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/integrations': {
+      id: '/_authenticated/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/escalations': {
       id: '/_authenticated/escalations'
       path: '/escalations'
@@ -276,6 +320,20 @@ declare module '@tanstack/react-router' {
       path: '/conversations'
       fullPath: '/conversations'
       preLoaderRoute: typeof AuthenticatedConversationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/campaigns': {
+      id: '/_authenticated/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/webhooks/whatsapp': {
@@ -310,20 +368,26 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
   AuthenticatedConversationsRoute: typeof AuthenticatedConversationsRoute
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEscalationsRoute: typeof AuthenticatedEscalationsRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
   AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedSimulatorRoute: typeof AuthenticatedSimulatorRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
   AuthenticatedConversationsRoute: AuthenticatedConversationsRoute,
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEscalationsRoute: AuthenticatedEscalationsRoute,
+  AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
   AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedSimulatorRoute: AuthenticatedSimulatorRoute,
