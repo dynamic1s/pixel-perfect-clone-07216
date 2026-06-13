@@ -1,30 +1,28 @@
 // AI Orchestrator — Gemini-powered sales assistant brain.
 // Server-only. Decides intent + action from a customer message using ONLY real product data.
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 export const ESCALATION_CONFIDENCE_THRESHOLD = 0.65;
 
 export const AiDecisionSchema = z.object({
-  intent: z.enum(["order", "faq", "complaint", "greeting", "other"]),
-  action: z.enum([
-    "create_order",
-    "reply",
-    "escalate",
-    "check_stock",
-    "send_payment",
-  ]),
+  intent: z
+    .enum(["order", "faq", "complaint", "greeting", "other"])
+    .catch("other"),
+  action: z
+    .enum(["create_order", "reply", "escalate", "check_stock", "send_payment"])
+    .catch("reply"),
   items: z
     .array(
       z.object({
         product: z.string(),
-        quantity: z.number().int().positive(),
+        quantity: z.coerce.number().int().positive().catch(1),
       }),
     )
-    .default([]),
-  reply: z.string(),
-  confidence: z.number().min(0).max(1),
+    .catch([]),
+  reply: z.string().catch(""),
+  confidence: z.coerce.number().min(0).max(1).catch(0.5),
 });
 
 export type AiDecision = z.infer<typeof AiDecisionSchema>;
